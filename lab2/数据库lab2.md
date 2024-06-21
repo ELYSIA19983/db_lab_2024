@@ -508,6 +508,11 @@ DELIMITER ;
 </body>
 </html>
 ```
+
+### 4.3仓库地址
+
+- [ELYSIA19983/db_lab_2024 (github.com)](https://github.com/ELYSIA19983/db_lab_2024)
+
 ## 5.项目运行演示
 
 - 登录页面可进行管理员和学生两种身份的登录
