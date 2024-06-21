@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理借阅信息</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>管理借阅信息</h1>
+        <!-- 错误信息展示 -->
+        {% if messages %}
+            <div class="alert alert-danger mt-3" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                    <br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <!-- 查询借阅信息表单 -->
+        <h2>查询借阅信息</h2>
+        <form method="get">
+            <div class="form-group">
+                <label for="borrow_id">借阅ID</label>
+                <input type="text" class="form-control" id="borrow_id" name="borrow_id">
+            </div>
+            <div class="form-group">
+                <label for="student_id">学生ID</label>
+                <input type="text" class="form-control" id="student_id" name="student_id">
+            </div>
+            <div class="form-group">
+                <label for="book_id">图书ID</label>
+                <input type="text" class="form-control" id="book_id" name="book_id">
+            </div>
+            <div class="form-group">
+                <label for="book_title">书名</label>
+                <input type="text" class="form-control" id="book_title" name="book_title">
+            </div>
+            <div class="form-group">
+                <label for="borrow_date">借阅日期</label>
+                <input type="date" class="form-control" id="borrow_date" name="borrow_date">
+            </div>
+            <div class="form-group">
+                <label for="due_date">到期日期</label>
+                <input type="date" class="form-control" id="due_date" name="due_date">
+            </div>
+            <div class="form-group">
+                <label for="return_date">归还日期</label>
+                <input type="date" class="form-control" id="return_date" name="return_date">
+            </div>
+            <button type="submit" class="btn btn-primary">搜索</button>
+        </form>
+
+        <!-- 借阅信息列表 -->
+        <h2>借阅信息列表</h2>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">借阅ID</th>
+                <th scope="col">学生ID</th>
+                <th scope="col">图书ID</th>
+                <th scope="col">书名</th>
+                <th scope="col">借阅日期</th>
+                <th scope="col">到期日期</th>
+                <th scope="col">归还日期</th>
+                <th scope="col">修改</th>
+                <th scope="col">删除</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if borrowing_list %}
+                {% for borrowing in borrowing_list %}
+                <tr>
+                    <td>{{ borrowing.0 }}</td>
+                    <td>{{ borrowing.1 }}</td>
+                    <td>{{ borrowing.2 }}</td>
+                    <td>{{ borrowing.3 }}</td>
+                    <td>{{ borrowing.4 }}</td>
+                    <td>{{ borrowing.5 }}</td>
+                    <td>{{ borrowing.6 }}</td>
+                    <td>
+                        <!-- 显示编辑表单 -->
+                        <button class="btn btn-primary btn-sm" onclick="toggleEditForm('{{ borrowing.0 }}')">修改信息</button>
+                    </td>
+                    <td>
+                        <!-- 删除借阅信息表单 -->
+                        <form method="post" class="mr-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="borrow_id" value="{{ borrowing.0 }}">
+                            <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr id="edit-form-{{ borrowing.0 }}" style="display:none;">
+                    <td colspan="9">
+                        <!-- 编辑借阅信息表单 -->
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="borrow_id" value="{{ borrowing.0 }}">
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label for="edit_student_id_{{ borrowing.0 }}">学生ID</label>
+                                    <input type="text" class="form-control" id="edit_student_id_{{ borrowing.0 }}" name="edit_student_id" value="{{ borrowing.1 }}" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="edit_book_id_{{ borrowing.0 }}">图书ID</label>
+                                    <input type="text" class="form-control" id="edit_book_id_{{ borrowing.0 }}" name="edit_book_id" value="{{ borrowing.2 }}" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="edit_book_title_{{ borrowing.0 }}">书名</label>
+                                    <input type="text" class="form-control" id="edit_book_title_{{ borrowing.0 }}" name="edit_book_title" value="{{ borrowing.3 }}" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="edit_borrow_date_{{ borrowing.0 }}">借阅日期</label>
+                                    <input type="date" class="form-control" id="edit_borrow_date_{{ borrowing.0 }}" name="edit_borrow_date" value="{{ borrowing.4 }}" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="edit_due_date_{{ borrowing.0 }}">到期日期</label>
+                                    <input type="date" class="form-control" id="edit_due_date_{{ borrowing.0 }}" name="edit_due_date" value="{{ borrowing.5 }}" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="edit_return_date_{{ borrowing.0 }}">归还日期</label>
+                                    <input type="date" class="form-control" id="edit_return_date_{{ borrowing.0 }}" name="edit_return_date" value="{{ borrowing.6 }}">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="9">暂无借阅信息</td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+
+        <script>
+        function toggleEditForm(borrowId) {
+            var form = document.getElementById('edit-form-' + borrowId);
+            if (form.style.display === 'none') {
+                form.style.display = 'table-row';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        </script>
+
+        <!-- 添加借阅信息表单 -->
+        <h2>添加借阅信息</h2>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <div class="form-group">
+                <label for="student_id">学生ID</label>
+                <input type="text" class="form-control" id="student_id" name="student_id" required>
+            </div>
+            <div class="form-group">
+                <label for="book_id">图书ID</label>
+                <input type="text" class="form-control" id="book_id" name="book_id" required>
+            </div>
+            <div class="form-group">
+                <label for="book_title">书名</label>
+                <input type="text" class="form-control" id="book_title" name="book_title" required>
+            </div>
+            <div class="form-group">
+                <label for="borrow_date">借阅日期</label>
+                <input type="date" class="form-control" id="borrow_date" name="borrow_date" required>
+            </div>
+            <div class="form-group">
+                <label for="due_date">到期日期</label>
+                <input type="date" class="form-control" id="due_date" name="due_date" required>
+            </div>
+            <div class="form-group">
+                <label for="return_date">归还日期</label>
+                <input type="date" class="form-control" id="return_date" name="return_date">
+            </div>
+            <button type="submit" class="btn btn-success">添加借阅信息</button>
+        </form>
+
+    </div>
+</body>
+</html>

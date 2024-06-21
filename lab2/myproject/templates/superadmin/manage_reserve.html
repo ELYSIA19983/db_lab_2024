@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理预订信息</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>管理预订信息</h1>
+        <!-- 错误信息展示 -->
+        {% if messages %}
+            <div class="alert alert-danger mt-3" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                    <br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <!-- 查询预订信息表单 -->
+        <h2>查询预订信息</h2>
+        <form method="get">
+            <div class="form-group">
+                <label for="reservation_id">预订ID</label>
+                <input type="text" class="form-control" id="reservation_id" name="reservation_id">
+            </div>
+            <div class="form-group">
+                <label for="student_id">学生ID</label>
+                <input type="text" class="form-control" id="student_id" name="student_id">
+            </div>
+            <div class="form-group">
+                <label for="book_id">图书ID</label>
+                <input type="text" class="form-control" id="book_id" name="book_id">
+            </div>
+            <div class="form-group">
+                <label for="book_title">书名</label>
+                <input type="text" class="form-control" id="book_title" name="book_title">
+            </div>
+            <div class="form-group">
+                <label for="reservation_date">预订日期</label>
+                <input type="date" class="form-control" id="reservation_date" name="reservation_date">
+            </div>
+            <div class="form-group">
+                <label for="expiration_date">到期日期</label>
+                <input type="date" class="form-control" id="expiration_date" name="expiration_date">
+            </div>
+            <button type="submit" class="btn btn-primary">搜索</button>
+        </form>
+
+        <!-- 预订信息列表 -->
+        <h2>预订信息列表</h2>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">预订ID</th>
+                <th scope="col">学生ID</th>
+                <th scope="col">图书ID</th>
+                <th scope="col">书名</th>
+                <th scope="col">预订日期</th>
+                <th scope="col">到期日期</th>
+                <th scope="col">修改</th>
+                <th scope="col">删除</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if reserve_list %}
+                {% for reserve in reserve_list %}
+                <tr>
+                    <td>{{ reserve.0 }}</td>
+                    <td>{{ reserve.1 }}</td>
+                    <td>{{ reserve.2 }}</td>
+                    <td>{{ reserve.3 }}</td>
+                    <td>{{ reserve.4 }}</td>
+                    <td>{{ reserve.5 }}</td>
+                    <td>
+                        <!-- 显示编辑表单 -->
+                        <button class="btn btn-primary btn-sm" onclick="toggleEditForm('{{ reserve.0 }}')">修改信息</button>
+                    </td>
+                    <td>
+                        <!-- 删除预订信息表单 -->
+                        <form method="post" class="mr-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="reservation_id" value="{{ reserve.0 }}">
+                            <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr id="edit-form-{{ reserve.0 }}" style="display:none;">
+                    <td colspan="8">
+                        <!-- 编辑预订信息表单 -->
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="reservation_id" value="{{ reserve.0 }}">
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label for="edit_student_id_{{ reserve.0 }}">学生ID</label>
+                                    <input type="text" class="form-control" id="edit_student_id_{{ reserve.0 }}" name="edit_student_id" value="{{ reserve.1 }}" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="edit_book_id_{{ reserve.0 }}">图书ID</label>
+                                    <input type="text" class="form-control" id="edit_book_id_{{ reserve.0 }}" name="edit_book_id" value="{{ reserve.2 }}" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="edit_book_title_{{ reserve.0 }}">书名</label>
+                                    <input type="text" class="form-control" id="edit_book_title_{{ reserve.0 }}" name="edit_book_title" value="{{ reserve.3 }}" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="edit_reservation_date_{{ reserve.0 }}">预订日期</label>
+                                    <input type="date" class="form-control" id="edit_reservation_date_{{ reserve.0 }}" name="edit_reservation_date" value="{{ reserve.4 }}" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="edit_expiration_date_{{ reserve.0 }}">到期日期</label>
+                                    <input type="date" class="form-control" id="edit_expiration_date_{{ reserve.0 }}" name="edit_expiration_date" value="{{ reserve.5 }}" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="8">暂无预订信息</td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+
+        <script>
+        function toggleEditForm(reservationId) {
+            var form = document.getElementById('edit-form-' + reservationId);
+            if (form.style.display === 'none') {
+                form.style.display = 'table-row';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        </script>
+
+        <!-- 添加预订信息表单 -->
+        <h2>添加预订信息</h2>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <div class="form-group">
+                <label for="student_id">学生ID</label>
+                <input type="text" class="form-control" id="student_id" name="student_id" required>
+            </div>
+            <div class="form-group">
+                <label for="book_id">图书ID</label>
+                <input type="text" class="form-control" id="book_id" name="book_id" required>
+            </div>
+            <div class="form-group">
+                <label for="book_title">书名</label>
+                <input type="text" class="form-control" id="book_title" name="book_title" required>
+            </div>
+            <div class="form-group">
+                <label for="reservation_date">预订日期</label>
+                <input type="date" class="form-control" id="reservation_date" name="reservation_date" required>
+            </div>
+            <div class="form-group">
+                <label for="expiration_date">到期日期</label>
+                <input type="date" class="form-control" id="expiration_date" name="expiration_date" required>
+            </div>
+            <button type="submit" class="btn btn-success">添加预订信息</button>
+        </form>
+
+    </div>
+</body>
+</html>

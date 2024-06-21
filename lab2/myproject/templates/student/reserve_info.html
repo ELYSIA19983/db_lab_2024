@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预订信息</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>预订信息</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">预订ID</th>
+                    <th scope="col">学生ID</th>
+                    <th scope="col">图书ID</th>
+                    <th scope="col">图书标题</th>
+                    <th scope="col">预订日期</th>
+                    <th scope="col">过期日期</th>
+                    <th scope="col">操作</th> <!-- 新添加的列 -->
+                </tr>
+            </thead>
+            <tbody>
+                {% if reserve_list %}
+                    {% for reservation in reserve_list %}
+                        <tr>
+                            <td>{{ reservation.0 }}</td>
+                            <td>{{ reservation.1 }}</td>
+                            <td>{{ reservation.2 }}</td>
+                            <td>{{ reservation.3 }}</td>
+                            <td>{{ reservation.4 }}</td>
+                            <td>{{ reservation.5 }}</td>
+                            <td>
+                                <!-- 取消预约表单 -->
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="ReservationID" value="{{ reservation.0 }}">
+                                    <button type="submit" class="btn btn-primary">取消预约</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7">暂无预订信息</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+

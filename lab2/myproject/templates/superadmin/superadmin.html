@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>超级管理员信息</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>超级管理员信息</h2>
+                <p><strong>ID:</strong> {{ superadminid }}</p>
+                <p><strong>姓名:</strong> {{ superadminname }}</p>
+                <p><strong>Email:</strong> {{ email }}</p>
+            </div>
+            <div class="col-md-6">
+                <h2>操作</h2>
+                <div class="btn-group-vertical">
+                    <a href="{% url 'sa_modify_info' superadmin_id=superadminid %}" class="btn btn-primary mb-3">修改信息</a>
+                    <a href="{% url 'manage_students' %}" class="btn btn-primary mb-3">管理学生</a>
+                    <a href="{% url 'manage_books' %}" class="btn btn-primary mb-3">管理图书</a>
+                    <a href="{% url 'manage_overdue' %}" class="btn btn-primary mb-3">管理逾期信息</a>
+                    <a href="{% url 'manage_borrowing' %}" class="btn btn-primary mb-3">查询借阅信息</a>
+                    <a href="{% url 'manage_reserve' %}" class="btn btn-primary mb-3">查询预约信息</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理学生</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>管理学生</h1>
+        <!-- 错误信息展示 -->
+        {% if messages %}
+            <div class="alert alert-danger mt-3" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                    <br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <!-- 查询学生表单 -->
+        <h2>查询学生</h2>
+        <form method="get">
+            <div class="form-group">
+                <label for="student_id">学生ID</label>
+                <input type="text" class="form-control" id="student_id" name="student_id">
+            </div>
+            <div class="form-group">
+                <label for="name">姓名</label>
+                <input type="text" class="form-control" id="name" name="name">
+            </div>
+            <div class="form-group">
+                <label for="department">部门</label>
+                <input type="text" class="form-control" id="department" name="department">
+            </div>
+            <div class="form-group">
+                <label for="email">邮箱</label>
+                <input type="email" class="form-control" id="email" name="email">
+            </div>
+            <div class="form-group">
+                <label for="borrowable">可借状态</label>
+                <select class="form-control" id="borrowable" name="canborrow">
+                    <option value="all">全部</option>
+                    <option value="true">可借</option>
+                    <option value="false">不可借</option>
+                </select>
+            </div>    
+            <button type="submit" class="btn btn-primary">搜索</button>
+        </form>
+
+        <!-- 学生列表 -->
+<h2>学生列表</h2>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">学生ID</th>
+        <th scope="col">姓名</th>
+        <th scope="col">部门</th>
+        <th scope="col">邮箱</th>
+        <th scope="col">可借状态</th>
+        <th scope="col">修改</th>
+        <th scope="col">注销</th>
+    </tr>
+    </thead>
+        <tbody>
+        {% if student_list %}
+            {% for student in student_list %}
+            <tr>
+                <td>{{ student.0 }}</td>
+                <td>{{ student.1 }}</td>
+                <td>{{ student.2 }}</td>
+                <td>{{ student.3 }}</td>
+                <td>{% if student.5 %}是{% else %}否{% endif %}</td>
+                <td>
+                    <!-- 显示编辑表单 -->
+                    <button class="btn btn-primary btn-sm" onclick="toggleEditForm('{{ student.0 }}')">修改信息</button>
+                </td>
+                <td>
+                    <!-- 删除学生表单 -->
+                    <form method="post" class="mr-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="student_id" value="{{ student.0 }}">
+                        <button type="submit" class="btn btn-danger btn-sm">注销</button>
+                    </form>
+                </td>
+            </tr>
+            <tr id="edit-form-{{ student.0 }}" style="display:none;">
+                <td colspan="7">
+                    <!-- 编辑学生信息表单 -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="edit">
+                        <input type="hidden" name="student_id" value="{{ student.0 }}">
+                        <div class="form-row">
+                            <div class="form-group col-md-3">
+                                <label for="edit_name_{{ student.0 }}">姓名</label>
+                                <input type="text" class="form-control" id="edit_name_{{ student.0 }}" name="edit_name" value="{{ student.1 }}" required>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="edit_department_{{ student.0 }}">部门</label>
+                                <input type="text" class="form-control" id="edit_department_{{ student.0 }}" name="edit_department" value="{{ student.2 }}">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="edit_email_{{ student.0 }}">邮箱</label>
+                                <input type="email" class="form-control" id="edit_email_{{ student.0 }}" name="edit_email" value="{{ student.3 }}" required>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="edit_borrowable_{{ student.0 }}">可借状态</label>
+                                <select class="form-control" id="edit_borrowable_{{ student.0 }}" name="edit_borrowable">
+                                    <option value="true" {% if student.5 %}selected{% endif %}>可借</option>
+                                    <option value="false" {% if not student.5 %}selected{% endif %}>不可借</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="7">暂无学生信息</td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+
+    <script>
+    function toggleEditForm(studentId) {
+        var form = document.getElementById('edit-form-' + studentId);
+        if (form.style.display === 'none') {
+            form.style.display = 'table-row';
+        } else {
+            form.style.display = 'none';
+        }
+    }
+    </script>
+
+
+        <!-- 添加学生表单 -->
+        <h2>添加学生</h2>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <div class="form-group">
+                <label for="student_id">学生ID</label>
+                <input type="text" class="form-control" id="student_id" name="student_id" pattern="^PB[0-9]{8}$" required>
+                <small id="student_id_help" class="form-text text-muted">格式为 PB + 8 位数字</small>
+            </div>
+            <div class="form-group">
+                <label for="name">姓名</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="department">部门</label>
+                <input type="text" class="form-control" id="department" name="department">
+            </div>
+            <div class="form-group">
+                <label for="email">邮箱</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">确认密码</label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+            </div>
+            <button type="submit" class="btn btn-success">添加学生</button>
+        </form>
+
+        
+    </div>
+</body>
+</html>

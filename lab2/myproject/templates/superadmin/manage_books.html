@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理图书</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>管理图书</h1>
+        <!-- 错误信息展示 -->
+        {% if messages %}
+            <div class="alert alert-danger mt-3" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                    <br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <!-- 查询图书表单 -->
+        <h2>查询图书</h2>
+        <form method="get">
+            <div class="form-group">
+                <label for="book_id">图书ID</label>
+                <input type="text" class="form-control" id="book_id" name="book_id">
+            </div>
+            <div class="form-group">
+                <label for="title">书名</label>
+                <input type="text" class="form-control" id="title" name="title">
+            </div>
+            <div class="form-group">
+                <label for="author">作者</label>
+                <input type="text" class="form-control" id="author" name="author">
+            </div>
+            <div class="form-group">
+                <label for="publisher">出版社</label>
+                <input type="text" class="form-control" id="publisher" name="publisher">
+            </div>
+            <div class="form-group">
+                <label for="year_published">出版年份</label>
+                <input type="text" class="form-control" id="year_published" name="year_published">
+            </div>
+            <div class="form-group">
+                <label for="isbn">ISBN</label>
+                <input type="text" class="form-control" id="isbn" name="isbn">
+            </div>    
+            <button type="submit" class="btn btn-primary">搜索</button>
+        </form>
+
+        <!-- 图书列表 -->
+        <h2>图书列表</h2>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">图书ID</th>
+                <th scope="col">书名</th>
+                <th scope="col">作者</th>
+                <th scope="col">出版社</th>
+                <th scope="col">出版年份</th>
+                <th scope="col">ISBN</th>
+                <th scope="col">可借副本数</th>
+                <th scope="col">修改</th>
+                <th scope="col">注销</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if book_list %}
+                {% for book in book_list %}
+                <tr>
+                    <td>{{ book.0 }}</td>
+                    <td>{{ book.1 }}</td>
+                    <td>{{ book.2 }}</td>
+                    <td>{{ book.3 }}</td>
+                    <td>{{ book.4 }}</td>
+                    <td>{{ book.5 }}</td>
+                    <td>{{ book.6 }}</td>
+                    <td>
+                        <!-- 显示编辑表单 -->
+                        <button class="btn btn-primary btn-sm" onclick="toggleEditForm('{{ book.0 }}')">修改信息</button>
+                    </td>
+                    <td>
+                        <!-- 删除图书表单 -->
+                        <form method="post" class="mr-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="book_id" value="{{ book.0 }}">
+                            <button type="submit" class="btn btn-danger btn-sm">注销</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr id="edit-form-{{ book.0 }}" style="display:none;">
+                    <td colspan="9">
+                        <!-- 编辑图书信息表单 -->
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="book_id" value="{{ book.0 }}">
+                            <div class="form-row">
+                                <div class="form-group col-md-2">
+                                    <label for="edit_title_{{ book.0 }}">书名</label>
+                                    <input type="text" class="form-control" id="edit_title_{{ book.0 }}" name="edit_title" value="{{ book.1 }}" required>
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="edit_author_{{ book.0 }}">作者</label>
+                                    <input type="text" class="form-control" id="edit_author_{{ book.0 }}" name="edit_author" value="{{ book.2 }}">
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="edit_publisher_{{ book.0 }}">出版社</label>
+                                    <input type="text" class="form-control" id="edit_publisher_{{ book.0 }}" name="edit_publisher" value="{{ book.3 }}">
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="edit_year_published_{{ book.0 }}">出版年份</label>
+                                    <input type="text" class="form-control" id="edit_year_published_{{ book.0 }}" name="edit_year_published" value="{{ book.4 }}">
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="edit_isbn_{{ book.0 }}">ISBN</label>
+                                    <input type="text" class="form-control" id="edit_isbn_{{ book.0 }}" name="edit_isbn" value="{{ book.5 }}">
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="edit_copies_available_{{ book.0 }}">可借副本数</label>
+                                    <input type="number" class="form-control" id="edit_copies_available_{{ book.0 }}" name="edit_copies_available" value="{{ book.6 }}">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="9">暂无图书信息</td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+
+        <script>
+        function toggleEditForm(bookId) {
+            var form = document.getElementById('edit-form-' + bookId);
+            if (form.style.display === 'none') {
+                form.style.display = 'table-row';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        </script>
+
+        <!-- 添加图书表单 -->
+        <h2>添加图书</h2>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <div class="form-group">
+                <label for="title">书名</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="author">作者</label>
+                <input type="text" class="form-control" id="author" name="author" required>
+            </div>
+            <div class="form-group">
+                <label for="publisher">出版社</label>
+                <input type="text" class="form-control" id="publisher" name="publisher">
+            </div>
+            <div class="form-group">
+                <label for="year_published">出版年份</label>
+                <input type="text" class="form-control" id="year_published" name="year_published">
+            </div>
+            <div class="form-group">
+                <label for="isbn">ISBN</label>
+                <input type="text" class="form-control" id="isbn" name="isbn">
+            </div>
+            <div class="form-group">
+                <label for="copies_available">可借副本数</label>
+                <input type="number" class="form-control" id="copies_available" name="copies_available">
+            </div>
+            <button type="submit" class="btn btn-success">添加图书</button>
+        </form>
+
+    </div>
+</body>
+</html>

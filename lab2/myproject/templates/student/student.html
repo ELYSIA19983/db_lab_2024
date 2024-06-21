@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生图书馆界面</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            margin-bottom: 10px; /* Add margin to buttons for spacing */
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        /* Adjust styles for left and right columns */
+        .left-column {
+            background-color: #ffffff; /* White background for left column */
+            padding: 20px;
+        }
+        .right-column {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    学生图书馆界面
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Left Column: Student Basic Information -->
+                        <div class="col-md-4 left-column">
+                            <h5>学生基本信息</h5>
+                            <p><strong>Student ID:</strong> {{ studentid }}</p>
+                            <p><strong>Name:</strong> {{ studentname }}</p>
+                            <p><strong>Department:</strong> {{ department }}</p>
+                            <p><strong>Email:</strong> {{ email }}</p>
+                            <p><strong>Can Borrow:</strong> {{ canborrow }}</p>
+                        </div>
+                        
+                        <!-- Right Column: Buttons -->
+                        <div class="col-md-8 right-column">
+                            <h5 class="card-title">请选择您要进行的操作:</h5>
+                            <a href="{% url 'st_modify_info' student_id=studentid%}" class="btn btn-custom btn-block">修改基本信息</a>
+                            <a href="{% url 'st_search_books' student_id=studentid%}" class="btn btn-custom btn-block">查询图书</a>
+                            <a href="{% url 'st_reserve_info' student_id=studentid%}" class="btn btn-custom btn-block">查阅预约信息</a>
+                            <a href="{% url 'st_borrowing_info' student_id=studentid%}" class="btn btn-custom btn-block">查询借阅信息</a>
+                            <a href="{% url 'st_overdue_info' student_id=studentid%}" class="btn btn-custom btn-block">查询逾期信息</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+

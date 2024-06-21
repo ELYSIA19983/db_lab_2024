@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理逾期信息</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>管理逾期信息</h1>
+        <!-- 错误信息展示 -->
+        {% if messages %}
+            <div class="alert alert-danger mt-3" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                    <br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <!-- 查询逾期信息表单 -->
+        <h2>查询逾期信息</h2>
+        <form method="get">
+            <div class="form-group">
+                <label for="overdue_id">逾期ID</label>
+                <input type="text" class="form-control" id="overdue_id" name="overdue_id">
+            </div>
+            <div class="form-group">
+                <label for="borrow_id">借阅ID</label>
+                <input type="text" class="form-control" id="borrow_id" name="borrow_id">
+            </div>
+            <div class="form-group">
+                <label for="book_title">书名</label>
+                <input type="text" class="form-control" id="book_title" name="book_title">
+            </div>
+            <div class="form-group">
+                <label for="fine_amount">罚款金额</label>
+                <input type="text" class="form-control" id="fine_amount" name="fine_amount">
+            </div>
+            <button type="submit" class="btn btn-primary">搜索</button>
+        </form>
+
+        <!-- 逾期信息列表 -->
+        <h2>逾期信息列表</h2>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">逾期ID</th>
+                <th scope="col">借阅ID</th>
+                <th scope="col">书名</th>
+                <th scope="col">罚款金额</th>
+                <th scope="col">修改</th>
+                <th scope="col">删除</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if overdue_list %}
+                {% for overdue in overdue_list %}
+                <tr>
+                    <td>{{ overdue.0 }}</td>
+                    <td>{{ overdue.1 }}</td>
+                    <td>{{ overdue.2 }}</td>
+                    <td>{{ overdue.3 }}</td>
+                    <td>
+                        <!-- 显示编辑表单 -->
+                        <button class="btn btn-primary btn-sm" onclick="toggleEditForm('{{ overdue.0 }}')">修改信息</button>
+                    </td>
+                    <td>
+                        <!-- 删除逾期信息表单 -->
+                        <form method="post" class="mr-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="overdue_id" value="{{ overdue.0 }}">
+                            <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr id="edit-form-{{ overdue.0 }}" style="display:none;">
+                    <td colspan="6">
+                        <!-- 编辑逾期信息表单 -->
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="overdue_id" value="{{ overdue.0 }}">
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label for="edit_borrow_id_{{ overdue.0 }}">借阅ID</label>
+                                    <input type="text" class="form-control" id="edit_borrow_id_{{ overdue.0 }}" name="edit_borrow_id" value="{{ overdue.1 }}" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="edit_book_title_{{ overdue.0 }}">书名</label>
+                                    <input type="text" class="form-control" id="edit_book_title_{{ overdue.0 }}" name="edit_book_title" value="{{ overdue.2 }}" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="edit_fine_amount_{{ overdue.0 }}">罚款金额</label>
+                                    <input type="text" class="form-control" id="edit_fine_amount_{{ overdue.0 }}" name="edit_fine_amount" value="{{ overdue.3 }}" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6">暂无逾期信息</td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+
+        <script>
+        function toggleEditForm(overdueId) {
+            var form = document.getElementById('edit-form-' + overdueId);
+            if (form.style.display === 'none') {
+                form.style.display = 'table-row';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        </script>
+
+        <!-- 添加逾期信息表单 -->
+        <h2>添加逾期信息</h2>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <div class="form-group">
+                <label for="borrow_id">借阅ID</label>
+                <input type="text" class="form-control" id="borrow_id" name="borrow_id" required>
+            </div>
+            <div class="form-group">
+                <label for="book_title">书名</label>
+                <input type="text" class="form-control" id="book_title" name="book_title" required>
+            </div>
+            <div class="form-group">
+                <label for="fine_amount">罚款金额</label>
+                <input type="text" class="form-control" id="fine_amount" name="fine_amount" required>
+            </div>
+            <button type="submit" class="btn btn-success">添加逾期信息</button>
+        </form>
+
+    </div>
+</body>
+</html>

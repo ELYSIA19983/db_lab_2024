@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>逾期信息</title>
+    <!-- 引入必要的样式表或者 JavaScript 文件 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- 可以根据需要引入其它的样式表或 JavaScript 文件 -->
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1>逾期信息列表</h1>
+        </header>
+        <div class="main-content">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">逾期ID</th>
+                        <th scope="col">借阅ID</th>
+                        <th scope="col">图书名称</th>
+                        <th scope="col">罚款金额(元)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if overdue_list %}
+                        {% for overdue in overdue_list %}
+                        <tr>
+                            <td>{{ overdue.0 }}</td>
+                            <td>{{ overdue.1 }}</td>
+                            <td>{{ overdue.2 }}</td>
+                            <td>{{ overdue.3 }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">暂无逾期信息</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

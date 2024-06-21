@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>检查借阅信息</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>检查借阅信息</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">借阅ID</th>
+                    <th scope="col">学生ID</th>
+                    <th scope="col">图书ID</th>
+                    <th scope="col">图书名称</th>
+                    <th scope="col">借阅日期</th>
+                    <th scope="col">到期日期</th>
+                    <th scope="col">归还日期</th>
+                    <th scope="col">操作</th> <!-- 新添加的列 -->
+                </tr>
+            </thead>
+            <tbody>
+                {% if borrowing_list %}
+                    {% for borrowing in borrowing_list %}
+                        <tr>
+                            <td>{{ borrowing.0 }}</td>
+                            <td>{{ borrowing.1 }}</td>
+                            <td>{{ borrowing.2 }}</td>
+                            <td>{{ borrowing.3 }}</td>
+                            <td>{{ borrowing.4 }}</td>
+                            <td>{{ borrowing.5 }}</td>
+                            <td id="return_date_{{ borrowing.0 }}">{{ borrowing.6 }}</td>
+                            <td>
+                                {% if borrowing.6 is None %}
+                                    <!-- 归还表单 -->
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="borrowing_id" value="{{ borrowing.0 }}">
+                                        <button type="submit" class="btn btn-primary">还书</button>
+                                    </form>
+                                {% else %}
+                                    已归还
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8">暂无借阅信息</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        
+    </div>
+</body>
+</html>
+
+
+

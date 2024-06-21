@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索图书</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>搜索图书</h1>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <form method="get">
+            <div class="form-group">
+                <label for="book_id">图书ID</label>
+                <input type="text" class="form-control" id="book_id" name="book_id">
+            </div>
+            <div class="form-group">
+                <label for="title">标题</label>
+                <input type="text" class="form-control" id="title" name="title">
+            </div>
+            <div class="form-group">
+                <label for="author">作者</label>
+                <input type="text" class="form-control" id="author" name="author">
+            </div>
+            <div class="form-group">
+                <label for="publisher">出版社</label>
+                <input type="text" class="form-control" id="publisher" name="publisher">
+            </div>
+            <div class="form-group">
+                <label for="year_published">出版年份</label>
+                <input type="text" class="form-control" id="year_published" name="year_published">
+            </div>
+            <div class="form-group">
+                <label for="isbn">ISBN</label>
+                <input type="text" class="form-control" id="isbn" name="isbn">
+            </div>
+            <button type="submit" class="btn btn-primary">搜索</button>
+        </form>
+        
+        <h2 class="mt-4">搜索结果</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">图书ID</th>
+                    <th scope="col">标题</th>
+                    <th scope="col">作者</th>
+                    <th scope="col">出版社</th>
+                    <th scope="col">出版年份</th>
+                    <th scope="col">ISBN</th>
+                    <th scope="col">可借数量</th>
+                    <th scope="col">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if book_list %}
+                    {% for book in book_list %}
+                        <tr>
+                            <td>{{ book.0 }}</td>
+                            <td>{{ book.1 }}</td>
+                            <td>{{ book.2 }}</td>
+                            <td>{{ book.3 }}</td>
+                            <td>{{ book.4 }}</td>
+                            <td>{{ book.5 }}</td>
+                            <td>{{ book.6 }}</td>
+                            <td>
+                                <!-- 借书表单 -->
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="borrow">
+                                    <input type="hidden" name="book_id" value="{{ book.0 }}">
+                                    <button type="submit" class="btn btn-success">借书</button>
+                                </form>
+                                <!-- 预订表单 -->
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="reserve">
+                                    <input type="hidden" name="book_id" value="{{ book.0 }}">
+                                    <button type="submit" class="btn btn-warning">预订</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7">暂无搜索结果</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
